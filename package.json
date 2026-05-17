@@ -1,0 +1,18 @@
+{
+  "name": "trading",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "preview:full": "concurrently -n server,frontend -c yellow,cyan \"npm run preview --prefix server\" \"npm run preview --prefix frontend\"",
+    "format": "prettier --write .",
+    "dev:full": "concurrently -n server,frontend -c yellow,cyan \"npm run dev --prefix server\" \"npm run dev --prefix frontend\"",
+    "build:full": "concurrently -n server,frontend -c yellow,cyan \"npm run build --prefix server\" \"npm run build --prefix frontend\"",
+    "format:check": "prettier --check .",
+    "test:full": "concurrently -n server,frontend -c yellow,cyan \"npm test --prefix server\" \"npm test --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.8.3"
+  }
+}

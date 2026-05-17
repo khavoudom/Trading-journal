@@ -1,0 +1,8 @@
+dist
+build
+node_modules
+*.sqlite
+*.db
+coverage
+server/node_modules
+server/dist

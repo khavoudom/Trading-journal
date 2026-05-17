@@ -1,0 +1,61 @@
+{
+  "name": "trading-journal-server",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "postinstall": "prisma generate",
+    "preview": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cmd": "tsx src/commands/index.ts"
+  },
+  "keywords": [
+    "trading",
+    "journal",
+    "api",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Backend API server for Trading Journal application",
+  "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "prisma": "^7.8.0",
+    "redis": "^5.12.1",
+    "socket.io": "^4.8.3",
+    "uuid": "^13.0.0",
+    "ws": "^8.20.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.19.19",
+    "@types/nodemailer": "^8.0.0",
+    "@types/ws": "^8.18.1",
+    "prisma": "^7.8.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.6"
+  }
+}
