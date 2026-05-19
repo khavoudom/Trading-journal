@@ -116,11 +116,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      return (
-        <ErrorPageFallback
-          onRetry={() => this.setState({ hasError: false, error: null })}
-        />
-      );
+      return <ErrorPageFallback onRetry={() => this.setState({ hasError: false, error: null })} />;
     }
     return this.props.children;
   }

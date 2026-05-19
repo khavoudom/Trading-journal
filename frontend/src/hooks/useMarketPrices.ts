@@ -29,7 +29,19 @@ export function useMarketPrices() {
         if (!cancelled) {
           const ordered = TICKER_ORDER.map((sym) => {
             const match = res.data.find((p) => p.instrument === sym);
-            return match || { instrument: sym, price: 0, change: 0, changePercent: 0, high: 0, low: 0, open: 0, previousClose: 0, timestamp: 0 };
+            return (
+              match || {
+                instrument: sym,
+                price: 0,
+                change: 0,
+                changePercent: 0,
+                high: 0,
+                low: 0,
+                open: 0,
+                previousClose: 0,
+                timestamp: 0,
+              }
+            );
           });
           setPrices(ordered);
           setError(null);

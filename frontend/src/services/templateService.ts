@@ -1,32 +1,12 @@
 import api from './api';
 import type {
   Template,
-  TemplateType,
   CreateTemplatePayload,
-  CreateTemplateTypePayload,
   UpdateTemplatePayload,
-  UpdateTemplateTypePayload,
   TemplateItemType,
 } from '@/types/template';
 
 export const templateService = {
-  // Types
-  getTypes: async (spaceId: string): Promise<TemplateType[]> => {
-    const res = await api.get('/templates/types', { params: { spaceId } });
-    return res.data;
-  },
-  createType: async (data: CreateTemplateTypePayload): Promise<TemplateType> => {
-    const res = await api.post('/templates/types', data);
-    return res.data;
-  },
-  deleteType: async (typeId: string): Promise<void> => {
-    await api.delete(`/templates/types/${typeId}`);
-  },
-  updateType: async (typeId: string, data: UpdateTemplateTypePayload): Promise<TemplateType> => {
-    const res = await api.put(`/templates/types/${typeId}`, data);
-    return res.data;
-  },
-
   // Templates
   getTemplates: async (spaceId: string, typeId?: string): Promise<Template[]> => {
     const params: Record<string, string> = { spaceId };

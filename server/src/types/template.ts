@@ -24,6 +24,7 @@ export interface TemplateData {
   typeId: string;
   type: TemplateTypeData;
   items: TemplateItemData[];
+  isAttached: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +38,7 @@ export interface CreateTemplateTypePayload {
 export interface CreateTemplatePayload {
   spaceId: string;
   name: string;
-  typeId: string;
+  typeId?: string;
   items: Array<{
     type: 'checkbox' | 'text' | 'number';
     label: string;
@@ -49,6 +50,7 @@ export interface CreateTemplatePayload {
 export interface UpdateTemplatePayload {
   name?: string;
   typeId?: string;
+  isAttached?: boolean;
 }
 
 export interface CreateTemplateItemPayload {

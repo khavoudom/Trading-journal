@@ -6,15 +6,6 @@ export const TEMPLATE_ITEM_TYPE_LABELS: Record<TemplateItemType, string> = {
   number: 'Number Input',
 };
 
-export interface TemplateType {
-  id: string;
-  userId: string;
-  spaceId: string;
-  name: string;
-  color: string;
-  createdAt: string;
-}
-
 export interface TemplateItem {
   id: string;
   templateId: string;
@@ -29,23 +20,15 @@ export interface Template {
   userId: string;
   spaceId: string;
   name: string;
-  typeId: string;
-  type: TemplateType;
   items: TemplateItem[];
+  isAttached: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface CreateTemplateTypePayload {
-  spaceId: string;
-  name: string;
-  color?: string;
 }
 
 export interface CreateTemplatePayload {
   spaceId: string;
   name: string;
-  typeId: string;
   items: Array<{
     type: TemplateItemType;
     label: string;
@@ -56,10 +39,5 @@ export interface CreateTemplatePayload {
 
 export interface UpdateTemplatePayload {
   name?: string;
-  typeId?: string;
-}
-
-export interface UpdateTemplateTypePayload {
-  name?: string;
-  color?: string;
+  isAttached?: boolean;
 }

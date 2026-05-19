@@ -17,7 +17,6 @@ export interface TemplateTradeItem {
 export interface TemplateTradeAttachment {
   templateId: string;
   templateName: string;
-  typeName: string;
   items: TemplateTradeItem[];
 }
 

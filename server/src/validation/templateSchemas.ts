@@ -9,7 +9,7 @@ export const createTemplateTypeSchema = z.object({
 export const createTemplateSchema = z.object({
   spaceId: z.string().min(1, 'spaceId is required'),
   name: z.string().min(1, 'Name is required').max(100),
-  typeId: z.string().min(1, 'typeId is required'),
+  typeId: z.string().optional(),
   items: z
     .array(
       z.object({
@@ -29,7 +29,8 @@ export const updateTemplateTypeSchema = z.object({
 
 export const updateTemplateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  typeId: z.string().min(1).optional(),
+  typeId: z.string().optional(),
+  isAttached: z.boolean().optional(),
 });
 
 export const createTemplateItemSchema = z.object({

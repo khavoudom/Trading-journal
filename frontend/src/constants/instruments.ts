@@ -1,4 +1,14 @@
-export const INSTRUMENTS = ['SPY', 'NQ', 'GC', 'CL', 'EURUSD', 'BTC', 'XAUUSD', 'GBPUSD', 'NASDAQ'] as const;
+export const INSTRUMENTS = [
+  'SPY',
+  'NQ',
+  'GC',
+  'CL',
+  'EURUSD',
+  'BTC',
+  'XAUUSD',
+  'GBPUSD',
+  'NASDAQ',
+] as const;
 
 export type Instrument = (typeof INSTRUMENTS)[number];
 

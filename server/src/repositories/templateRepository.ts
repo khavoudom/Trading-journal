@@ -64,7 +64,6 @@ export const templateRepository = {
     return prisma.template.findMany({
       where,
       include: {
-        type: { select: typeSelect },
         items: { orderBy: itemOrder },
       },
       orderBy: { createdAt: 'desc' },
@@ -76,7 +75,6 @@ export const templateRepository = {
     return prisma.template.findUnique({
       where: { id },
       include: {
-        type: { select: typeSelect },
         items: { orderBy: itemOrder },
       },
     });
@@ -87,7 +85,7 @@ export const templateRepository = {
     spaceId: string,
     data: {
       name: string;
-      typeId: string;
+      typeId: string | null;
       items: Array<{ type: string; label: string; value?: string; order: number }>;
     },
   ) => {
@@ -111,7 +109,6 @@ export const templateRepository = {
           },
         },
         include: {
-          type: { select: typeSelect },
           items: { orderBy: itemOrder },
         },
       });
@@ -120,7 +117,7 @@ export const templateRepository = {
     return template;
   },
 
-  update: async (id: string, data: { name?: string; typeId?: string }) => {
+  update: async (id: string, data: { name?: string; typeId?: string; isAttached?: boolean }) => {
     const prisma = getPrisma();
     await prisma.template.update({ where: { id }, data });
   },

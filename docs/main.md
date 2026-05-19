@@ -45,33 +45,35 @@ trading/
 
 ## Frontend Routes
 
-| Path | Page | Description |
-|------|------|-------------|
-| `/login` | LoginPage | Authentication — email/password login |
-| `/register` | RegisterPage | New user registration |
-| `/space/:spaceId/dashboard` | DashboardPage | Home — recent trades, key metrics, portfolio chart |
-| `/space/:spaceId/portfolio` | PortfolioPage | Trade list, history, and management |
-| `/space/:spaceId/analytics` | AnalyticsPage | Performance analytics, equity curve, distribution charts |
-| `/space/:spaceId/calendar` | CalendarPage | Calendar view with trade events and drawings |
-| `/space/:spaceId/alerts` | AlertsPage | Risk alerts and notifications |
-| `/space/:spaceId/risk-manager` | RiskManagerPage | Risk rules configuration and management |
-| `/space/:spaceId/drawing-board` | DrawingBoardPage | Freeform drawing canvas for chart markups |
-| `/space/:spaceId/watchlist` | WatchlistPage | Track watched instruments |
-| `/space/:spaceId/backtest` | BacktestPage | Strategy backtesting with equity curve preview |
-| `/space/:spaceId/schedule` | SchedulePage | Scheduled tasks and reminders |
-| `/space/:spaceId/trade-plan` | TradePlanPage | Trading plan templates and rule setup |
-| `/space/:spaceId/settings` | SettingsPage | User and space settings |
+| Path                            | Page             | Description                                              |
+| ------------------------------- | ---------------- | -------------------------------------------------------- |
+| `/login`                        | LoginPage        | Authentication — email/password login                    |
+| `/register`                     | RegisterPage     | New user registration                                    |
+| `/space/:spaceId/dashboard`     | DashboardPage    | Home — recent trades, key metrics, portfolio chart       |
+| `/space/:spaceId/portfolio`     | PortfolioPage    | Trade list, history, and management                      |
+| `/space/:spaceId/analytics`     | AnalyticsPage    | Performance analytics, equity curve, distribution charts |
+| `/space/:spaceId/calendar`      | CalendarPage     | Calendar view with trade events and drawings             |
+| `/space/:spaceId/alerts`        | AlertsPage       | Risk alerts and notifications                            |
+| `/space/:spaceId/risk-manager`  | RiskManagerPage  | Risk rules configuration and management                  |
+| `/space/:spaceId/drawing-board` | DrawingBoardPage | Freeform drawing canvas for chart markups                |
+| `/space/:spaceId/watchlist`     | WatchlistPage    | Track watched instruments                                |
+| `/space/:spaceId/backtest`      | BacktestPage     | Strategy backtesting with equity curve preview           |
+| `/space/:spaceId/schedule`      | SchedulePage     | Scheduled tasks and reminders                            |
+| `/space/:spaceId/trade-plan`    | TradePlanPage    | Trading plan templates and rule setup                    |
+| `/space/:spaceId/settings`      | SettingsPage     | User and space settings                                  |
 
 ## API Endpoints
 
 All API routes are prefixed with `/api` unless noted.
 
 **Authentication** (`/api/auth`)
+
 - `POST /api/auth/register` — Create account
 - `POST /api/auth/login` — Log in
 - `GET /api/auth/me` — Get current user
 
 **Trades** (`/api/trades`)
+
 - `GET /api/trades?spaceId=` — List trades in space
 - `GET /api/trades/:id` — Get trade by ID
 - `POST /api/trades` — Create trade
@@ -80,60 +82,71 @@ All API routes are prefixed with `/api` unless noted.
 - `GET /api/trades/analytics/summary?spaceId=` — Aggregated analytics (win rate, P&L, etc.)
 
 **Trade Plans** (`/api/plan`)
+
 - `GET /api/plan?spaceId=` — Get plan data
 - `PUT /api/plan` — Update plan data
 
 **Spaces** (`/api`)
+
 - `GET /api/spaces` — List user's spaces
 - `POST /api/spaces` — Create space
 - `PUT /api/spaces/:id` — Update space
 - `DELETE /api/spaces/:id` — Delete space
 
 **Risk Rules** (`/api/risk-rules`)
+
 - `GET /api/risk-rules?spaceId=` — List rules
 - `POST /api/risk-rules` — Create rule
 - `PUT /api/risk-rules/:id` — Update rule
 - `DELETE /api/risk-rules/:id` — Delete rule
 
 **Templates** (`/api/templates`)
+
 - `GET /api/templates?spaceId=` — List templates
 - `POST /api/templates` — Create template
 - `PUT /api/templates/:id` — Update template
 - `DELETE /api/templates/:id` — Delete template
 
 **Calendar Events** (`/api`)
+
 - `GET /api/events?spaceId=&date=` — List events
 - `POST /api/events` — Create event
 - `PUT /api/events/:id` — Update event
 - `DELETE /api/events/:id` — Delete event
 
 **Drawings** (`/api`)
+
 - `GET /api/drawings?spaceId=&date=` — List drawings
 - `POST /api/drawings` — Create drawing
 - `PUT /api/drawings/:id` — Update drawing
 - `DELETE /api/drawings/:id` — Delete drawing
 
 **Scheduled Tasks** (`/api`)
+
 - `GET /api/schedule-tasks?spaceId=` — List scheduled tasks
 - `POST /api/schedule-tasks` — Create scheduled task
 - `PUT /api/schedule-tasks/:id` — Update scheduled task
 - `DELETE /api/schedule-tasks/:id` — Delete scheduled task
 
 **Price Data** (`/api`)
+
 - `GET /api/price?symbol=&from=&to=` — Historical price data
 - `GET /api/price/realtime?symbol=` — Latest real-time price
 
 **Settings** (`/api/settings`)
+
 - `GET /api/settings/:spaceId` — Get space settings
 - `PUT /api/settings/:spaceId` — Update space settings
 - `PUT /api/settings/:spaceId/notifications` — Update notification preferences
 
 **System**
+
 - `GET /health` — Health check endpoint
 
 ## Data Model
 
 ### Trade
+
 - `id` (string) — Unique identifier
 - `instrument` (string) — Trading instrument (e.g., OANDA:XAUUSD)
 - `side` (enum: Long | Short) — Trade direction
@@ -151,33 +164,43 @@ All API routes are prefixed with `/api` unless noted.
 - `status` (enum: pending | running | closed) — Trade lifecycle state
 
 ### Space
+
 - `id`, `userId`, `name`, `createdAt`
 
 ### User
+
 - `id`, `email`, `username`, `password` (hashed), `createdAt`
 
 ### PlanData
+
 - `checklist`, `coreRules`, `tradingSetup`, `mistakes`, `identity` (string[])
 
 ### CalendarEvent
+
 - `id`, `userId`, `spaceId`, `date`, `title`, `content`
 
 ### Drawing
+
 - `id`, `userId`, `spaceId`, `date`, `title`, `sceneData` (JSON)
 
 ### ScheduledTask
+
 - Task with date/time, type, reminder settings, recurrence config
 
 ### Notification
+
 - System notifications with type, category, read state, and optional link path
 
 ### RiskRule
+
 - Configurable risk management rules per space
 
 ### Template
+
 - Trade plan templates with typed items (checkbox, text, number)
 
 ### Settings
+
 - Per-space settings including notification preferences
 
 ## Key Services
@@ -207,6 +230,7 @@ cd frontend && npm run dev   # Frontend on :5173
 ## Environment Variables
 
 **server/.env**
+
 - `PORT` — Server port (default: 3001)
 - `JWT_SECRET` — Secret key for JWT signing
 - `DATABASE_URL` — PostgreSQL connection string

@@ -12,6 +12,7 @@ import {
   Type,
   Hash,
   Loader2,
+  ChevronDown,
 } from 'lucide-react';
 import type { TradeFormValues, TemplateTradeAttachment, TemplateTradeItem } from '@/types/trade';
 import { INSTRUMENTS, INSTRUMENT_PRICE_RANGES, CONTRACT_SIZES } from '@/constants/instruments';
@@ -127,37 +128,45 @@ const TradeForm: React.FC<TradeFormProps> = ({
     ? formatDateForInput(prefillDate + 'T17:00:00')
     : formatDateForInput(initialData?.exitTime);
 
-  // Template state — fetch all templates globally and show them in every trade
+  // Template state — fetch all templates and show only attached
   const { templates, loading: templatesLoading, fetchTemplates } = useTemplateStore();
   const [templateAttachments, setTemplateAttachments] = useState<TemplateTradeAttachment[]>([]);
+  const [collapsedTemplates, setCollapsedTemplates] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchTemplates(spaceId);
   }, [spaceId, fetchTemplates]);
 
-  // Build template attachments from fetched templates + existing checked state
+  // Build template attachments from attached templates + existing checked state
   useEffect(() => {
     const existing = (initialData?.planData as TemplateTradeAttachment[]) || [];
     const existingByTemplateId = new Map(existing.map((e) => [e.templateId, e]));
 
-    const attachments: TemplateTradeAttachment[] = templates.map((tmpl) => {
-      const existingAttachment = existingByTemplateId.get(tmpl.id);
-      return {
-        templateId: tmpl.id,
-        templateName: tmpl.name,
-        typeName: tmpl.type?.name || 'Unknown',
-        items: tmpl.items.map((item) => {
-          const existingItem = existingAttachment?.items.find((i) => i.itemId === item.id);
-          return {
-            itemId: item.id,
-            label: item.label,
-            type: item.type as 'checkbox' | 'text' | 'number',
-            checked: existingItem?.checked ?? false,
-            value: item.value ?? null,
-          };
-        }),
-      };
-    });
+    // Show templates that are attached (in DB) OR already attached to this trade
+    const visibleIds = new Set([
+      ...templates.filter((t) => t.isAttached).map((t) => t.id),
+      ...existing.map((e) => e.templateId),
+    ]);
+
+    const attachments: TemplateTradeAttachment[] = templates
+      .filter((tmpl) => visibleIds.has(tmpl.id))
+      .map((tmpl) => {
+        const existingAttachment = existingByTemplateId.get(tmpl.id);
+        return {
+          templateId: tmpl.id,
+          templateName: tmpl.name,
+          items: tmpl.items.map((item) => {
+            const existingItem = existingAttachment?.items.find((i) => i.itemId === item.id);
+            return {
+              itemId: item.id,
+              label: item.label,
+              type: item.type as 'checkbox' | 'text' | 'number',
+              checked: existingItem?.checked ?? false,
+              value: item.value ?? null,
+            };
+          }),
+        };
+      });
 
     setTemplateAttachments(attachments);
   }, [templates]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -494,6 +503,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                   const checkedCount = attachment.items.filter(
                     (i) => i.type === 'checkbox' && i.checked,
                   ).length;
+                  const isCollapsed = collapsedTemplates[attachment.templateId] ?? false;
 
                   return (
                     <div
@@ -502,12 +512,23 @@ const TradeForm: React.FC<TradeFormProps> = ({
                     >
                       {/* Template header */}
                       <div className="flex items-center justify-between px-3 py-2.5 bg-surface2">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setCollapsedTemplates((prev) => ({
+                              ...prev,
+                              [attachment.templateId]: !(prev[attachment.templateId] ?? false),
+                            }))
+                          }
+                          className="flex items-center gap-2 min-w-0 flex-1"
+                        >
+                          <ChevronDown
+                            className={`w-3.5 h-3.5 text-text2 transition-transform ${
+                              isCollapsed ? '-rotate-90' : ''
+                            }`}
+                          />
                           <span className="text-xs font-semibold text-text">
                             {attachment.templateName}
-                          </span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium text-text2 bg-surface">
-                            {attachment.typeName}
                           </span>
                           {checkboxCount > 0 && (
                             <span
@@ -518,80 +539,84 @@ const TradeForm: React.FC<TradeFormProps> = ({
                               {checkedCount}/{checkboxCount}
                             </span>
                           )}
-                        </div>
+                        </button>
                       </div>
 
                       {/* Items */}
-                      <div className="px-3 py-2 bg-surface">
-                        <div className="space-y-0.5">
-                          {attachment.items.map((item) => (
-                            <div
-                              key={item.itemId}
-                              className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-surface2 transition-colors"
-                            >
-                              {item.type === 'checkbox' ? (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setTemplateAttachments((prev) =>
-                                        prev.map((at) =>
-                                          at.templateId === attachment.templateId
-                                            ? {
-                                                ...at,
-                                                items: at.items.map((i) =>
-                                                  i.itemId === item.itemId
-                                                    ? { ...i, checked: !i.checked }
-                                                    : i,
-                                                ),
-                                              }
-                                            : at,
-                                        ),
-                                      )
-                                    }
-                                    className="shrink-0 cursor-pointer"
-                                  >
-                                    {item.checked ? (
-                                      <CheckCircle2 className="w-4 h-4 text-green" />
-                                    ) : (
-                                      <Circle className="w-4 h-4 text-text2" />
-                                    )}
-                                  </button>
-                                  <span
-                                    className={`text-xs ${
-                                      item.checked
-                                        ? 'text-green line-through opacity-80'
-                                        : 'text-text2'
-                                    }`}
-                                  >
-                                    {item.label}
-                                  </span>
-                                </>
-                              ) : (
-                                <>
-                                  <span className="text-gray-500 shrink-0">
-                                    {ITEM_TYPE_ICONS[item.type]}
-                                  </span>
-                                  <span className="text-xs text-text2">{item.label}</span>
-                                  {item.value && (
-                                    <span className="text-[10px] text-gray-500 font-mono ml-auto">
-                                      {item.value}
+                      {!isCollapsed && (
+                        <div className="px-3 py-2 bg-surface">
+                          <div className="space-y-0.5">
+                            {attachment.items.map((item) => (
+                              <div
+                                key={item.itemId}
+                                className="flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-surface2 transition-colors"
+                              >
+                                {item.type === 'checkbox' ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setTemplateAttachments((prev) =>
+                                          prev.map((at) =>
+                                            at.templateId === attachment.templateId
+                                              ? {
+                                                  ...at,
+                                                  items: at.items.map((i) =>
+                                                    i.itemId === item.itemId
+                                                      ? { ...i, checked: !i.checked }
+                                                      : i,
+                                                  ),
+                                                }
+                                              : at,
+                                          ),
+                                        )
+                                      }
+                                      className="shrink-0 cursor-pointer"
+                                    >
+                                      {item.checked ? (
+                                        <CheckCircle2 className="w-4 h-4 text-green" />
+                                      ) : (
+                                        <Circle className="w-4 h-4 text-text2" />
+                                      )}
+                                    </button>
+                                    <span
+                                      className={`text-xs prose prose-invert max-w-none [&_*]:!text-xs ${
+                                        item.checked
+                                          ? 'text-green line-through opacity-80'
+                                          : 'text-text2'
+                                      }`}
+                                      dangerouslySetInnerHTML={{ __html: item.label }}
+                                    />
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="text-gray-500 shrink-0">
+                                      {ITEM_TYPE_ICONS[item.type]}
                                     </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                        {checkboxCount > 0 && (
-                          <div className="mt-2 h-1 bg-border rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full transition-all bg-green`}
-                              style={{ width: `${progress}%` }}
-                            />
+                                    <span
+                                      className="text-xs text-text2 prose prose-invert max-w-none [&_*]:!text-xs"
+                                      dangerouslySetInnerHTML={{ __html: item.label }}
+                                    />
+                                    {item.value && (
+                                      <span className="text-[10px] text-gray-500 font-mono ml-auto">
+                                        {item.value}
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            ))}
                           </div>
-                        )}
-                      </div>
+                          {checkboxCount > 0 && (
+                            <div className="mt-2 h-1 bg-border rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all bg-green`}
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}

@@ -45,11 +45,7 @@ export const templateService = {
     await templateRepository.deleteType(typeId);
   },
 
-  updateType: async (
-    userId: string,
-    typeId: string,
-    input: { name?: string; color?: string },
-  ) => {
+  updateType: async (userId: string, typeId: string, input: { name?: string; color?: string }) => {
     const existing = await templateRepository.findTypeById(typeId);
     if (!existing) throw new AppError('Template type not found', 404);
     if (existing.userId !== userId) throw new AppError('Unauthorized', 403);
@@ -90,7 +86,7 @@ export const templateService = {
     await authorizationService.ensureSpaceAccess(userId, data.spaceId);
     return templateRepository.create(userId, data.spaceId, {
       name: data.name,
-      typeId: data.typeId,
+      typeId: data.typeId ?? null,
       items: data.items,
     });
   },
@@ -98,7 +94,7 @@ export const templateService = {
   updateTemplate: async (
     userId: string,
     templateId: string,
-    input: { name?: string; typeId?: string },
+    input: { name?: string; typeId?: string; isAttached?: boolean },
   ) => {
     const existing = await templateRepository.findById(templateId);
     if (!existing) throw new AppError('Template not found', 404);

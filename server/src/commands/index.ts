@@ -171,7 +171,7 @@ function makeTrade(i: number, userId: string, spaceId: string) {
   // ~60% win rate, randomize exit price
   const isWin = Math.random() < 0.6;
   const priceMovePct = isWin
-    ? randFloat(0.3, 4.0)   // winner
+    ? randFloat(0.3, 4.0) // winner
     : randFloat(-4.0, -0.3); // loser
   const exitPrice = parseFloat(
     (entryPrice + (side === 'Long' ? 1 : -1) * entryPrice * (priceMovePct / 100)).toFixed(
@@ -191,7 +191,10 @@ function makeTrade(i: number, userId: string, spaceId: string) {
   const entryTime = new Date(Date.now() - daysAgo * 86400000 - Math.random() * 86400000 * 0.3);
   const exitTime = new Date(entryTime.getTime() + Math.random() * 86400000 * 2 + 3600000);
 
-  const pl = status === 'closed' ? calcPL(instrument, side, entryPrice, exitPrice, quantity) : { profitLoss: 0, profitLossPercent: 0 };
+  const pl =
+    status === 'closed'
+      ? calcPL(instrument, side, entryPrice, exitPrice, quantity)
+      : { profitLoss: 0, profitLossPercent: 0 };
 
   return {
     id: uuidv4(),
@@ -239,7 +242,10 @@ register({
       process.exit(1);
     }
 
-    logger.info('CMD', `Seeding 100 trades for user "${user.username}" / space "${space.name}" ...`);
+    logger.info(
+      'CMD',
+      `Seeding 100 trades for user "${user.username}" / space "${space.name}" ...`,
+    );
 
     const trades = Array.from({ length: 100 }, (_, i) => makeTrade(i, userId, spaceId));
 
@@ -255,8 +261,14 @@ register({
     const closed = trades.filter((t) => t.status === 'closed');
     const winners = closed.filter((t) => t.profitLoss > 0);
     logger.info('CMD', 'Done.');
-    logger.info('CMD', `  Total: 100 trades (${trades.filter((t) => t.status === 'closed').length} closed, ${trades.filter((t) => t.status === 'running').length} running, ${trades.filter((t) => t.status === 'pending').length} pending)`);
-    logger.info('CMD', `  Closed win rate: ${closed.length > 0 ? Math.round((winners.length / closed.length) * 100) : 0}% (${winners.length}W / ${closed.length - winners.length}L)`);
+    logger.info(
+      'CMD',
+      `  Total: 100 trades (${trades.filter((t) => t.status === 'closed').length} closed, ${trades.filter((t) => t.status === 'running').length} running, ${trades.filter((t) => t.status === 'pending').length} pending)`,
+    );
+    logger.info(
+      'CMD',
+      `  Closed win rate: ${closed.length > 0 ? Math.round((winners.length / closed.length) * 100) : 0}% (${winners.length}W / ${closed.length - winners.length}L)`,
+    );
   },
 });
 

@@ -6,12 +6,22 @@ import {
   Check,
   X,
   Loader2,
-  ArrowRightToLine,
   CheckSquare,
   Type,
   Hash,
+  Link,
+  Link2Off,
 } from 'lucide-react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
+import TextEditor from '@/components/shared/TextEditor';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
 import type { Template, TemplateItemType } from '@/types/template';
 import { TEMPLATE_ITEM_TYPE_LABELS } from '@/types/template';
 
@@ -23,12 +33,11 @@ const ITEM_TYPE_ICONS: Record<TemplateItemType, React.ReactNode> = {
 
 export function TemplateCard({
   template,
-  typeName,
-  typeColor,
   isExpanded,
   isEditingName,
   editName,
   saving,
+  isAttached,
   onToggleExpand,
   onStartEdit,
   onSaveEdit,
@@ -36,16 +45,17 @@ export function TemplateCard({
   onEditNameChange,
   onDelete,
   onAttach,
+  onDetach,
   onAddItem,
   onDeleteItem,
+  onEditItem,
 }: {
   template: Template;
-  typeName: string;
-  typeColor: string;
   isExpanded: boolean;
   isEditingName: boolean;
   editName: string;
   saving: boolean;
+  isAttached: boolean;
   onToggleExpand: () => void;
   onStartEdit: () => void;
   onSaveEdit: () => void;
@@ -53,9 +63,14 @@ export function TemplateCard({
   onEditNameChange: (v: string) => void;
   onDelete: () => void;
   onAttach: () => void;
+  onDetach: () => void;
   onAddItem: () => void;
   onDeleteItem: (itemId: string) => void;
+  onEditItem: (itemId: string, data: { type: TemplateItemType; label: string }) => void;
 }) {
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editItemLabel, setEditItemLabel] = useState('');
+  const [editItemType, setEditItemType] = useState<TemplateItemType>('checkbox');
   return (
     <div className="border border-border rounded-lg overflow-hidden">
       {/* Template header row */}
@@ -69,10 +84,6 @@ export function TemplateCard({
           ) : (
             <ChevronRight className="w-4 h-4 text-gray-500 shrink-0" />
           )}
-          <div
-            className="w-2.5 h-2.5 rounded-full shrink-0"
-            style={{ backgroundColor: typeColor }}
-          />
           {isEditingName ? (
             <Input
               value={editName}
@@ -84,12 +95,6 @@ export function TemplateCard({
           ) : (
             <span className="text-sm font-semibold text-text truncate">{template.name}</span>
           )}
-          <span
-            className="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0"
-            style={{ backgroundColor: `${typeColor}20`, color: typeColor }}
-          >
-            {typeName}
-          </span>
           <span className="text-[10px] text-gray-500 shrink-0">{template.items.length} items</span>
         </div>
         <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -115,13 +120,23 @@ export function TemplateCard({
             </>
           ) : (
             <>
-              <button
-                onClick={onAttach}
-                className="flex items-center gap-1 px-2 h-6 rounded text-[10px] font-medium text-green hover:bg-green-subtle transition-colors cursor-pointer"
-                title="Attach to trade"
-              >
-                <ArrowRightToLine className="w-3 h-3" /> Attach
-              </button>
+              {isAttached ? (
+                <button
+                  onClick={onDetach}
+                  className="flex items-center gap-1 px-2 h-6 rounded text-[10px] font-medium text-orange hover:bg-orange-subtle transition-colors cursor-pointer"
+                  title="Remove from trade"
+                >
+                  <Link2Off className="w-3 h-3" /> Remove
+                </button>
+              ) : (
+                <button
+                  onClick={onAttach}
+                  className="flex items-center gap-1 px-2 h-6 rounded text-[10px] font-medium text-green hover:bg-green-subtle transition-colors cursor-pointer"
+                  title="Attach to trade"
+                >
+                  <Link className="w-3 h-3" /> Attach
+                </button>
+              )}
               <button
                 onClick={onStartEdit}
                 className="w-6 h-6 rounded flex items-center justify-center text-text2 hover:bg-surface transition-colors cursor-pointer"
@@ -155,20 +170,94 @@ export function TemplateCard({
                   key={item.id}
                   className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-surface2 transition-colors group/item"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    <span className="text-gray-500 shrink-0">{ITEM_TYPE_ICONS[item.type]}</span>
-                    <span className="text-xs text-text2 truncate">{item.label}</span>
-                    <span className="text-[9px] text-gray-500 uppercase tracking-wider shrink-0">
-                      {TEMPLATE_ITEM_TYPE_LABELS[item.type]}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => onDeleteItem(item.id)}
-                    className="w-5 h-5 rounded flex items-center justify-center text-text2 opacity-0 group-hover/item:opacity-100 hover:text-orange hover:bg-orange-subtle transition-all cursor-pointer shrink-0"
-                    title="Delete item"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
+                  {editingItemId === item.id ? (
+                    <div className="flex items-start gap-2 flex-1 min-w-0 w-full">
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <Select
+                          value={editItemType}
+                          onValueChange={(v) => setEditItemType(v as TemplateItemType)}
+                        >
+                          <SelectTrigger className="w-[110px] h-7 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="checkbox">
+                              <span className="flex items-center gap-1.5">
+                                <CheckSquare className="w-3 h-3" /> Checkbox
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="text">
+                              <span className="flex items-center gap-1.5">
+                                <Type className="w-3 h-3" /> Text
+                              </span>
+                            </SelectItem>
+                            <SelectItem value="number">
+                              <span className="flex items-center gap-1.5">
+                                <Hash className="w-3 h-3" /> Number
+                              </span>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <TextEditor
+                          value={editItemLabel}
+                          onChange={setEditItemLabel}
+                          minHeight={80}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                        <button
+                          onClick={() => {
+                            const stripped = editItemLabel.replace(/<[^>]+>/g, '').trim();
+                            if (stripped) {
+                              onEditItem(item.id, { type: editItemType, label: editItemLabel.trim() });
+                              setEditingItemId(null);
+                            }
+                          }}
+                          className="w-6 h-6 rounded flex items-center justify-center text-green hover:bg-green-subtle transition-colors cursor-pointer"
+                          title="Save"
+                        >
+                          <Check className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => setEditingItemId(null)}
+                          className="w-6 h-6 rounded flex items-center justify-center text-text2 hover:bg-surface transition-colors cursor-pointer"
+                          title="Cancel"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span className="text-gray-500 shrink-0">{ITEM_TYPE_ICONS[item.type]}</span>
+                        <span className="text-xs text-text2 truncate [&_*]:!text-xs prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: item.label }} />
+                        <span className="text-[9px] text-gray-500 uppercase tracking-wider shrink-0">
+                          {TEMPLATE_ITEM_TYPE_LABELS[item.type]}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <button
+                          onClick={() => {
+                            setEditingItemId(item.id);
+                            setEditItemLabel(item.label);
+                            setEditItemType(item.type);
+                          }}
+                          className="w-5 h-5 rounded flex items-center justify-center text-text2 opacity-0 group-hover/item:opacity-100 hover:text-green hover:bg-green-subtle transition-all cursor-pointer"
+                          title="Edit item"
+                        >
+                          <Pencil className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => onDeleteItem(item.id)}
+                          className="w-5 h-5 rounded flex items-center justify-center text-text2 opacity-0 group-hover/item:opacity-100 hover:text-orange hover:bg-orange-subtle transition-all cursor-pointer"
+                          title="Delete item"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

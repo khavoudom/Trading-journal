@@ -1,25 +1,17 @@
 import { create } from 'zustand';
 import type {
   Template,
-  TemplateType,
   CreateTemplatePayload,
-  CreateTemplateTypePayload,
   UpdateTemplatePayload,
-  UpdateTemplateTypePayload,
   TemplateItemType,
 } from '@/types/template';
 import { templateService } from '@/services/templateService';
 
 interface TemplateState {
-  types: TemplateType[];
   templates: Template[];
   loading: boolean;
   error: string | null;
-  fetchTypes: (spaceId: string) => Promise<void>;
-  createType: (data: CreateTemplateTypePayload) => Promise<TemplateType>;
-  deleteType: (typeId: string) => Promise<void>;
-  updateType: (typeId: string, data: UpdateTemplateTypePayload) => Promise<void>;
-  fetchTemplates: (spaceId: string, typeId?: string) => Promise<void>;
+  fetchTemplates: (spaceId: string) => Promise<void>;
   createTemplate: (data: CreateTemplatePayload) => Promise<void>;
   updateTemplate: (id: string, data: UpdateTemplatePayload) => Promise<void>;
   deleteTemplate: (id: string) => Promise<void>;
@@ -32,64 +24,18 @@ interface TemplateState {
     data: Partial<{ type: TemplateItemType; label: string; order: number }>,
   ) => Promise<void>;
   deleteItem: (itemId: string) => Promise<void>;
+  toggleAttach: (templateId: string, currentAttached: boolean) => Promise<void>;
 }
 
 export const useTemplateStore = create<TemplateState>()((set) => ({
-  types: [],
   templates: [],
   loading: false,
   error: null,
 
-  fetchTypes: async (spaceId: string) => {
+  fetchTemplates: async (spaceId: string) => {
     set({ loading: true, error: null });
     try {
-      const data = await templateService.getTypes(spaceId);
-      set({ types: data, loading: false });
-    } catch (err: any) {
-      set({ error: err.message || 'Failed to fetch template types', loading: false });
-    }
-  },
-
-  createType: async (data: CreateTemplateTypePayload) => {
-    set({ error: null });
-    try {
-      const newType = await templateService.createType(data);
-      set((state) => ({ types: [...state.types, newType] }));
-      return newType;
-    } catch (err: any) {
-      set({ error: err.message || 'Failed to create template type' });
-      throw err;
-    }
-  },
-
-  deleteType: async (typeId: string) => {
-    set({ error: null });
-    try {
-      await templateService.deleteType(typeId);
-      set((state) => ({ types: state.types.filter((t) => t.id !== typeId) }));
-    } catch (err: any) {
-      set({ error: err.message || 'Failed to delete template type' });
-      throw err;
-    }
-  },
-
-  updateType: async (typeId: string, data: UpdateTemplateTypePayload) => {
-    set({ error: null });
-    try {
-      const updated = await templateService.updateType(typeId, data);
-      set((state) => ({
-        types: state.types.map((t) => (t.id === typeId ? updated : t)),
-      }));
-    } catch (err: any) {
-      set({ error: err.message || 'Failed to update template type' });
-      throw err;
-    }
-  },
-
-  fetchTemplates: async (spaceId: string, typeId?: string) => {
-    set({ loading: true, error: null });
-    try {
-      const data = await templateService.getTemplates(spaceId, typeId);
+      const data = await templateService.getTemplates(spaceId);
       set({ templates: data, loading: false });
     } catch (err: any) {
       set({ error: err.message || 'Failed to fetch templates', loading: false });
@@ -182,6 +128,22 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
       }));
     } catch (err: any) {
       set({ error: err.message || 'Failed to delete template item' });
+      throw err;
+    }
+  },
+
+  toggleAttach: async (templateId: string, currentAttached: boolean) => {
+    set({ error: null });
+    const newAttached = !currentAttached;
+    try {
+      await templateService.updateTemplate(templateId, { isAttached: newAttached });
+      set((state) => ({
+        templates: state.templates.map((t) =>
+          t.id === templateId ? { ...t, isAttached: newAttached } : t,
+        ),
+      }));
+    } catch (err: any) {
+      set({ error: err.message || 'Failed to update template' });
       throw err;
     }
   },
