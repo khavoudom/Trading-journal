@@ -58,3 +58,8 @@ export interface UpdateTemplatePayload {
   name?: string;
   typeId?: string;
 }
+
+export interface UpdateTemplateTypePayload {
+  name?: string;
+  color?: string;
+}

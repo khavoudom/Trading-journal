@@ -8,6 +8,7 @@ const router = Router();
 router.get('/types', authMiddleware, templateController.getTypes);
 router.post('/types', authMiddleware, templateController.createType);
 router.delete('/types/:typeId', authMiddleware, templateController.deleteType);
+router.put('/types/:typeId', authMiddleware, templateController.updateType);
 
 // Templates
 router.get('/', authMiddleware, templateController.getTemplates);

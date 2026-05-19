@@ -25,6 +25,7 @@ const TradePlanPage: React.FC<TradePlanPageProps> = ({ spaceId }) => {
     fetchTypes,
     createType,
     deleteType,
+    updateType,
     fetchTemplates,
     createTemplate,
     updateTemplate,
@@ -207,7 +208,10 @@ const TradePlanPage: React.FC<TradePlanPageProps> = ({ spaceId }) => {
                 if (!editingTypeId || !editTypeName.trim()) return;
                 setSavingType(true);
                 try {
-                  await updateTemplate(editingTypeId, { name: editTypeName.trim() });
+                  await updateType(editingTypeId, {
+                    name: editTypeName.trim(),
+                    color: editTypeColor,
+                  });
                   setEditingTypeId(null);
                 } catch {
                   /* silent */

@@ -2,6 +2,7 @@ import { templateRepository } from '@/repositories/templateRepository.js';
 import { validate } from '@/validation/index.js';
 import {
   createTemplateTypeSchema,
+  updateTemplateTypeSchema,
   createTemplateSchema,
   updateTemplateSchema,
   createTemplateItemSchema,
@@ -42,6 +43,19 @@ export const templateService = {
     }
 
     await templateRepository.deleteType(typeId);
+  },
+
+  updateType: async (
+    userId: string,
+    typeId: string,
+    input: { name?: string; color?: string },
+  ) => {
+    const existing = await templateRepository.findTypeById(typeId);
+    if (!existing) throw new AppError('Template type not found', 404);
+    if (existing.userId !== userId) throw new AppError('Unauthorized', 403);
+
+    const data = validate(updateTemplateTypeSchema, input);
+    return templateRepository.updateType(typeId, data);
   },
 
   // ---- Templates ----

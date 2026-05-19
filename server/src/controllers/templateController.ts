@@ -38,6 +38,17 @@ export const templateController = {
     }
   },
 
+  updateType: async (req: AuthRequest, res: Response) => {
+    try {
+      const typeId = req.params.typeId as string;
+      const result = await templateService.updateType(req.userId!, typeId, req.body);
+      return res.json(result);
+    } catch (error: any) {
+      const status = error.statusCode || 500;
+      return res.status(status).json({ error: error.message || 'Failed to update template type' });
+    }
+  },
+
   // ---- Templates ----
 
   getTemplates: async (req: AuthRequest, res: Response) => {

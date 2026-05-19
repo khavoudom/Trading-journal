@@ -22,6 +22,11 @@ export const createTemplateSchema = z.object({
     .min(1, 'At least one item is required'),
 });
 
+export const updateTemplateTypeSchema = z.object({
+  name: z.string().min(1).max(50).optional(),
+  color: z.string().optional(),
+});
+
 export const updateTemplateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   typeId: z.string().min(1).optional(),

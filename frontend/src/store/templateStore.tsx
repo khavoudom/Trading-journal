@@ -5,6 +5,7 @@ import type {
   CreateTemplatePayload,
   CreateTemplateTypePayload,
   UpdateTemplatePayload,
+  UpdateTemplateTypePayload,
   TemplateItemType,
 } from '@/types/template';
 import { templateService } from '@/services/templateService';
@@ -17,6 +18,7 @@ interface TemplateState {
   fetchTypes: (spaceId: string) => Promise<void>;
   createType: (data: CreateTemplateTypePayload) => Promise<TemplateType>;
   deleteType: (typeId: string) => Promise<void>;
+  updateType: (typeId: string, data: UpdateTemplateTypePayload) => Promise<void>;
   fetchTemplates: (spaceId: string, typeId?: string) => Promise<void>;
   createTemplate: (data: CreateTemplatePayload) => Promise<void>;
   updateTemplate: (id: string, data: UpdateTemplatePayload) => Promise<void>;
@@ -67,6 +69,19 @@ export const useTemplateStore = create<TemplateState>()((set) => ({
       set((state) => ({ types: state.types.filter((t) => t.id !== typeId) }));
     } catch (err: any) {
       set({ error: err.message || 'Failed to delete template type' });
+      throw err;
+    }
+  },
+
+  updateType: async (typeId: string, data: UpdateTemplateTypePayload) => {
+    set({ error: null });
+    try {
+      const updated = await templateService.updateType(typeId, data);
+      set((state) => ({
+        types: state.types.map((t) => (t.id === typeId ? updated : t)),
+      }));
+    } catch (err: any) {
+      set({ error: err.message || 'Failed to update template type' });
       throw err;
     }
   },

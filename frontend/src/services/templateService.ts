@@ -5,6 +5,7 @@ import type {
   CreateTemplatePayload,
   CreateTemplateTypePayload,
   UpdateTemplatePayload,
+  UpdateTemplateTypePayload,
   TemplateItemType,
 } from '@/types/template';
 
@@ -20,6 +21,10 @@ export const templateService = {
   },
   deleteType: async (typeId: string): Promise<void> => {
     await api.delete(`/templates/types/${typeId}`);
+  },
+  updateType: async (typeId: string, data: UpdateTemplateTypePayload): Promise<TemplateType> => {
+    const res = await api.put(`/templates/types/${typeId}`, data);
+    return res.data;
   },
 
   // Templates

@@ -40,6 +40,11 @@ export const templateRepository = {
     });
   },
 
+  updateType: async (id: string, data: { name?: string; color?: string }) => {
+    const prisma = getPrisma();
+    return prisma.templateType.update({ where: { id }, data, select: typeSelect });
+  },
+
   deleteType: async (id: string) => {
     const prisma = getPrisma();
     await prisma.templateType.delete({ where: { id } });
