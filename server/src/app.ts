@@ -3,11 +3,13 @@ import cors from 'cors';
 import routes from '@/routes/index.js';
 import { AppError } from '@/errors/AppError.js';
 import { logger, requestLogger } from '@/utils/logger.js';
+import { config } from '@/config/index.js';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
+app.use('/uploads', express.static(config.uploadDir));
 app.use(requestLogger);
 
 app.get('/health', (_req, res) => {

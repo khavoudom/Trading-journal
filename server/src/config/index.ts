@@ -1,4 +1,8 @@
 import 'dotenv/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function requireEnv(name: string): string {
   const value = process.env[name];
@@ -16,4 +20,5 @@ export const config = {
   redisUrl: process.env.REDIS_URL || '',
   yahooFinanceBaseUrl:
     process.env.YAHOO_FINANCE_BASE_URL || 'https://query1.finance.yahoo.com/v8/finance/chart',
+  uploadDir: process.env.UPLOAD_DIR || path.resolve(__dirname, '../../uploads'),
 };
