@@ -23,6 +23,7 @@ export function TradeTable({
             <th className="text-left py-2.5 pr-3 font-medium">P/L %</th>
             <th className="text-left py-2.5 pr-3 font-medium">Mindset</th>
             <th className="text-left py-2.5 pr-3 font-medium">Plan</th>
+            <th className="text-left py-2.5 pr-3 font-medium">Images</th>
             <th className="text-left py-2.5 pr-3 font-medium">Date</th>
             <th className="text-right py-2.5 font-medium"></th>
           </tr>

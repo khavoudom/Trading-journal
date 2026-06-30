@@ -18,6 +18,7 @@ import type { TradeFormValues, TemplateTradeAttachment, TemplateTradeItem } from
 import { INSTRUMENTS, INSTRUMENT_PRICE_RANGES, CONTRACT_SIZES } from '@/constants/instruments';
 import { useTemplateStore } from '@/store/templateStore';
 import { formatUSD } from '@/utils/format';
+import { ImageUploader } from '@/components/shared/ImageUploader';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -201,6 +202,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
       tags: [],
       notes: '',
       emotion: 'neutral',
+      screenshots: [],
       planData: [],
       status: 'pending',
       ...initialData,
@@ -644,6 +646,12 @@ const TradeForm: React.FC<TradeFormProps> = ({
               ))}
             </div>
           </div>
+
+          {/* Screenshots */}
+          <ImageUploader
+            urls={initialData?.screenshots || []}
+            onChange={(newUrls) => setValue('screenshots', newUrls)}
+          />
 
           {/* Notes */}
           <div className="space-y-1.5">
